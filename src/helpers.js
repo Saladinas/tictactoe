@@ -5,3 +5,15 @@ export const randomString = () => {
 export const flipACoin = () => {
     return Math.random() >= 0.5;
 }
+
+export const isEmpty = (element) => {
+    return element === '-';
+}
+
+export const isDraw = (userChar) => {
+    return userChar !== 'x' ? 'x' : 'o';
+}
+
+export const getCPUChar = (userChar) => {
+    return userChar !== 'x' ? 'x' : 'o';
+}

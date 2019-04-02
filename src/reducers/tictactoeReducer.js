@@ -1,32 +1,38 @@
-// TODO: make action.types as constants so can reuse in reducer and actions
 import { randomString } from '../helpers';
+import {
+  MAKE_A_MOVE, MAKE_A_CPU_MOVE, UPDATE_WINNER_POSITIONS,
+  UNDO, REPLAY, USER_TURN, CHANGE_USER_CHAR
+} from '../actions/tictactoe';
 
-const initialState = {
-  matchId: randomString(), //string, identifies the current match, required
-  boardState: [
-    "-", "-", "-", // first row of the game board, positions 0, 1, 2
-    "-", "-", "-", // second row of the game board, positions 3, 4, 5
-    "-", "-", "-" // third row of the game board, positions 6, 7, 8
-  ], // array of chars ( one of ['o','x','-']), required
-  lastMove: {
+const getinitialLastMove = () => {
+  return {
     char: "", // char one of ['o','x'], required
     position: "" // number from 0 to 8, required 
-  }, // object, represents the next move of the player, required only on input
-  lastCPUMove: {
-    char: "", // char one of ['o','x'], required
-    position: "" // number from 0 to 8, required 
-  }, // object, represents the next move of the player, required only on input
-  winnerPositions: [],
-  userChar: null,
-  isUserTurn: null,
-  // "customField1": "customValue1", // any format, optional for the developer
-  // "customField2": "customValue1", // any format, optional for the developer
-  // "customField3": "customValue1" // any format, optional for the developer
+  }
 }
+
+const getinitialState = () => {
+  return {
+    matchId: randomString(), //string, identifies the current match, required
+    boardState: [
+      "-", "-", "-", // first row of the game board, positions 0, 1, 2
+      "-", "-", "-", // second row of the game board, positions 3, 4, 5
+      "-", "-", "-" // third row of the game board, positions 6, 7, 8
+    ], // array of chars ( one of ['o','x','-']), required
+    lastMove: getinitialLastMove(), // object, represents the next move of the player, required only on input
+    lastCPUMove: getinitialLastMove(), // object, represents the next move of the CPU, required only on input
+    winnerPositions: [],
+    userChar: null,
+    isUserTurn: null,
+  }
+
+}
+
+const initialState = getinitialState();
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case 'MAKE_A_MOVE':
+    case MAKE_A_MOVE:
       const updatedBoard = state.boardState.map((item, index) => {
         if (index !== action.payload.position) {
           // This isn't the item we care about - keep it as-is
@@ -41,7 +47,7 @@ export default (state = initialState, action) => {
         boardState: updatedBoard,
         isUserTurn: false,
       }
-    case 'MAKE_A_CPU_MOVE':
+    case MAKE_A_CPU_MOVE:
       const newBoard = state.boardState.map((item, index) => {
         if (index !== action.payload.position) {
           // This isn't the item we care about - keep it as-is
@@ -49,7 +55,6 @@ export default (state = initialState, action) => {
         }
         return state.userChar !== 'x' ? 'x' : 'o';
       });
-
       return {
         ...state,
         lastCPUMove: {
@@ -59,40 +64,41 @@ export default (state = initialState, action) => {
         boardState: newBoard,
         isUserTurn: true,
       }
-    case 'UPDATE_WINNER_POSITIONS':
+    case UPDATE_WINNER_POSITIONS:
       return {
         ...state,
         winnerPositions: action.payload.positions,
-        isUserTurn: true,
+        isUserTurn: false,
       }
-    case 'UNDO':
-    console.log(state.lastMove.position);
-    console.log(state.lastCPUMove.position);
+    case UNDO:
       const previousBoard = state.boardState.map((item, index) => {
         if (index !== state.lastMove.position && index !== state.lastCPUMove.position) {
           // This isn't the item we care about - keep it as-is
           return item
         }
-        console.log('test');
         return '-';
       });
       return {
         ...state,
-        boardState: previousBoard
+        boardState: previousBoard,
+        lastMove: getinitialLastMove(),
+        lastCPUMove: getinitialLastMove(),
+        winnerPositions: [],
+        isUserTurn: true,
       }
-    case 'CHANGE_USER_CHAR':
+    case CHANGE_USER_CHAR:
       return {
         ...state,
         userChar: action.payload.userChar,
         isUserTurn: action.payload.isUserTurn,
       }
-    case 'USER_TURN':
+    case USER_TURN:
       return {
         ...state,
         isUserTurn: true,
       }
-    case 'REPLAY':
-      return initialState;
+    case REPLAY:
+      return getinitialState();
     default:
       return state
   }
