@@ -43,7 +43,7 @@ class Header extends Component {
 
     render() {
         const { classes, userChar, matchId, isDraw } = this.props;
-        console.log('a');
+
         return (
             <Grid container
                 spacing={0}
